@@ -16,8 +16,8 @@ class MazeApplication:
 
     def start_interface(self):
         self.window.title("Maze Solver")
-        canvas_width = (self.n + 1) * 15
-        canvas_height = (self.m + 1) * 15
+        canvas_width = (self.n) * 15
+        canvas_height = (self.m) * 15
         self.ffs = Canvas(self.window, width=canvas_width, height=canvas_height, bg='grey')
         self.ffs.pack()
         self.get_coordinates_start_frame()
@@ -92,6 +92,7 @@ class MazeApplication:
         if not result:
             showinfo("Result", "Nu exista nici un drum de la coordonatele de start la cele de final")
         print(result)
+
     def destroy_old(self):
         self.coord_x.destroy()
         self.coord_y.destroy()

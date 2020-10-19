@@ -1,6 +1,5 @@
 import time
-from random import uniform
-
+import random
 import numpy as np
 
 
@@ -8,7 +7,7 @@ class MazeSolver:
     def __init__(self, application):
         self.maze_app = application
         self.path = []
-        self.temperature = 0.95
+        self.temperature = 0.9
 
     def initialize_start_state(self, n, m, maze, start, end):
         init_state = [[0 for i in range(n)] for j in range(m)]
@@ -38,13 +37,22 @@ class MazeSolver:
             return False
         return True
 
-
-    def new_transition(self, state, position, color):
-        state[position[0]][position[1]] = 'r'
+    def update_ui(self, position, color):
         self.maze_app.draw(position[0], position[1], color)
         time.sleep(0.1)
         self.maze_app.window.update()
+
+    def new_transition(self, state, position, color):
+        state[position[0]][position[1]] = 'r'
+        self.update_ui(position, color)
         return state
+
+    def get_neighbours(self,position):
+        up = [position[0] + 1, position[1]]
+        down = [position[0] - 1, position[1]]
+        left = [position[0], position[1] - 1]
+        right = [position[0], position[1] + 1]
+        return [up, down, left, right]
 
     def backtracking_solve_maze(self, state, position):
         if not self.is_valid_transition(state, position) or state[position[0]][position[1]] == 'r':
@@ -62,22 +70,12 @@ class MazeSolver:
             self.path.pop()
         return False
 
-
     def get_adjacents(self,state, position):
         final = list()
         for i in self.get_neighbours(position):
             if self.is_valid_transition(state, i) and state[i[0]][i[1]] != 'r':
                 final.append(i)
         return final
-
-
-    def get_neighbours(self,position):
-        up = [position[0] + 1, position[1]]
-        down = [position[0] - 1, position[1]]
-        left = [position[0], position[1] - 1]
-        right = [position[0], position[1] + 1]
-        return [up, down, left, right]
-
 
     def bfs_solve_maze(self, state, start):
         queue = [start]
@@ -97,31 +95,32 @@ class MazeSolver:
                 self.new_transition(state, position, "green")
         return False
 
-
     def hillclimbing_solve_maze(self, state, start, end):
+        random.seed(25)
         current_position = start
         self.new_transition(state, start, "orange")
         path = [current_position]
-        while current_position != end:
+        while not self.is_final_state(state, current_position):
             prev_state = current_position
-            for neighbour in self.get_neighbours(current_position):
+            neighbours = self.get_neighbours(current_position)
+            random.shuffle(neighbours)
+            for neighbour in neighbours:
                 if self.is_valid_transition(state, neighbour):
                     if self.is_final_state(state, neighbour):
                         path.append(neighbour)
+                        self.new_transition(state, neighbour, "orange")
                         return path
-                    succ = neighbour
-                    if self.is_better(succ, current_position, end):
-                        current_position = succ
+                    if self.is_better(neighbour, current_position, end):
+                        current_position = neighbour
+                        break
             if current_position == prev_state:
                 return False
             self.new_transition(state, current_position, "orange")
             path.append(current_position)
         return path
 
-
     def value(self, state, end):
         return abs(end[0] - state[0]) + abs(end[1] - state[1])
-
 
     def is_better(self, s1, s2, end):
         val1 = self.value(s1, end)
@@ -131,27 +130,31 @@ class MazeSolver:
         return val1 < val2
 
     def update_temperature(self):
-        self.temperature = self.temperature * 0.95
+        self.temperature = self.temperature - 0.01
 
     def simulated_solve_maze(self, state, start, end):
+        self.temperature = 0.9
         current_position = start
-        self.new_transition(state, start, "orange")
+        self.new_transition(state, start, "pink")
         path = [current_position]
-        while current_position != end:
+        while not self.is_final_state(state, current_position):
             prev_state = current_position
             for neighbour in self.get_neighbours(current_position):
                 if self.is_valid_transition(state, neighbour):
                     if self.is_final_state(state, neighbour):
                         path.append(neighbour)
+                        self.new_transition(state, neighbour, "pink")
                         return path
-                    succ = neighbour
-                    if self.is_better(succ, current_position, end):
-                        current_position = succ
-                    elif uniform(0, 1) < np.exp(-abs(self.value(current_position, end) - self.value(succ, end)) / self.temperature):
-                        current_position = succ
+                    if self.is_better(neighbour, current_position, end):
+                        current_position = neighbour
+                        break
+                    elif random.uniform(0, 1) < np.exp(-abs(self.value(current_position, end) - self.value(neighbour, end)) / self.temperature):
+                        current_position = neighbour
+                        self.update_temperature()
+                        print(self.temperature)
+                        break
             if current_position == prev_state:
                 return False
-            self.update_temperature()
-            self.new_transition(state, current_position, "orange")
+            self.new_transition(state, current_position, "pink")
             path.append(current_position)
         return path
