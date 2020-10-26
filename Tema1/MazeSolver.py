@@ -60,6 +60,7 @@ class MazeSolver:
         if self.is_final_state(state, position):
             state[position[0]][position[1]] = 'r'
             self.path.append(position)
+            self.new_transition(state, position, "blue")
             return self.path
         if self.is_valid_transition(state, position):
             state = self.new_transition(state, position, "blue")
@@ -86,6 +87,7 @@ class MazeSolver:
                 path = queue.pop(0)
             position = path[-1]
             if self.is_final_state(state, position):
+                self.new_transition(state, position, "green")
                 return path
             elif state[position[0]][position[1]] != 'r':
                 for i in self.get_adjacents(state, position):
