@@ -1,10 +1,11 @@
 import math
 import random
 from tkinter import *
-from tkinter.messagebox import showerror, showinfo
+from tkinter.messagebox import showerror, showinfo, showwarning
+import time
 
 
-class ChekersGame(object):
+class CheckersGame(object):
 	def init_board_with_pieces(self):
 		self.board_with_pieces = [[0 for _ in range(self.dimension)] for _ in range(self.dimension)]
 		for row in range(self.dimension):
@@ -16,7 +17,6 @@ class ChekersGame(object):
 				else:
 					self.board_with_pieces[row][column] = self.board[row][column]
 
-
 	def mouse_calc(self, x, y):
 		return y // self.cell_size, x // self.cell_size
 
@@ -24,16 +24,14 @@ class ChekersGame(object):
 	def get_rectangle_color(row, col):
 		return "black" if (row + col) % 2 else "white"
 
-
-	def get_best_move(self, new_state, opposant_state):
-		return sum([piece_c[0] for piece_c in new_state ])- sum([piece_h[0] for piece_h in opposant_state])
+	def get_best_move(self, new_state, opposer_state):
+		return sum([piece_c[0] for piece_c in new_state]) - sum([piece_h[0] for piece_h in opposer_state])
 
 	def ai_one_level(self):
 		maxim, move_maxim = -math.inf, (-1, -1)
 		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'c']
 		random.shuffle(pieces_locations_calc)
-		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								 self.board_with_pieces[i][j] == 'h']
+		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'h']
 		for index, piece in enumerate(pieces_locations_calc):
 			moves = self.get_valid_moves(piece[0], piece[1])
 			new_state = pieces_locations_calc.copy()
@@ -41,7 +39,7 @@ class ChekersGame(object):
 				for move in moves:
 					new_state[index] = move
 					move_value = self.get_best_move(new_state, pieces_locations_human)
-					if  move_value > maxim:
+					if move_value > maxim:
 						maxim = move_value
 						move_maxim = move
 						print(maxim, move_maxim)
@@ -52,7 +50,6 @@ class ChekersGame(object):
 			showerror("Game Over!", "You lost the game!")
 		else:
 			self.turn = 'h'
-
 
 	def mouse_click(self, event):
 		row, col = self.mouse_calc(event.x, event.y)
@@ -72,19 +69,18 @@ class ChekersGame(object):
 						showinfo("Congratulation!", "You win!")
 					else:
 						self.ai_one_level()
+		elif not self.final_state_h():
+			showwarning("Warning!", "Please wait, it's not your turn!")
 
 	def final_state_c(self):
-		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								 self.board_with_pieces[i][j] == 'c']
+		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'c']
 		for piece in pieces_locations_calc:
 			if piece[0] != self.dimension - 1:
 				return False
 		return True
 
-
 	def final_state_h(self):
-		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								  self.board_with_pieces[i][j] == 'h']
+		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'h']
 		for piece in pieces_locations_human:
 			if piece[0] != 0:
 				return False
@@ -95,9 +91,9 @@ class ChekersGame(object):
 		if who_moved == 'h':
 			self.draw_oval(row, col, self.human_color)
 		else:
+			time.sleep(1)
 			self.draw_oval(row, col, self.computer_color)
-		self.draw_rectangle(old_row, old_col,
-							self.get_rectangle_color(old_row, old_col))
+		self.draw_rectangle(old_row, old_col, self.get_rectangle_color(old_row, old_col))
 
 	def update_matrix(self, row, col, old_position, who_moved):
 		old_row, old_col = old_position[0], old_position[1]
@@ -115,13 +111,11 @@ class ChekersGame(object):
 			direction_up, direction_down = -1, 1
 		else:
 			direction_up, direction_down = 1, -1
-		directions = [(1 * direction_up, -1), (1 * direction_up, 0), (1 * direction_up, 1), (0, 1),
-					  (1 * direction_down, 1), (1 * direction_down, 0), (1 * direction_down, -1), (0, -1)]
+		directions = [(1 * direction_up, -1), (1 * direction_up, 0), (1 * direction_up, 1), (0, 1), (1 * direction_down, 1), (1 * direction_down, 0), (1 * direction_down, -1), (0, -1)]
 		for d in directions:
 			if self.check_move(row + d[0], col + d[1]):
 				moves.append([row + d[0], col + d[1]])
 		return moves
-
 
 	def legal_move(self, row, col):
 		if [row, col] in self.get_valid_moves(self.selected_piece[0], self.selected_piece[1]):
