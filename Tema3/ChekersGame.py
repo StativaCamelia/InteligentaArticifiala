@@ -1,5 +1,7 @@
 import math
+import random
 from tkinter import *
+from tkinter.messagebox import showerror, showinfo
 
 
 class ChekersGame(object):
@@ -14,6 +16,7 @@ class ChekersGame(object):
 				else:
 					self.board_with_pieces[row][column] = self.board[row][column]
 
+
 	def mouse_calc(self, x, y):
 		return y // self.cell_size, x // self.cell_size
 
@@ -23,26 +26,33 @@ class ChekersGame(object):
 
 
 	def get_best_move(self, new_state, opposant_state):
-		return sum([piece_c[1] for piece_c in new_state ])- sum([piece_h[1] for piece_h in opposant_state])
+		return sum([piece_c[0] for piece_c in new_state ])- sum([piece_h[0] for piece_h in opposant_state])
 
 	def ai_one_level(self):
 		maxim, move_maxim = -math.inf, (-1, -1)
 		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'c']
+		random.shuffle(pieces_locations_calc)
 		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 								 self.board_with_pieces[i][j] == 'h']
 		for index, piece in enumerate(pieces_locations_calc):
 			moves = self.get_valid_moves(piece[0], piece[1])
 			new_state = pieces_locations_calc.copy()
-			for move in moves:
-				new_state[index] = move
-				move_value = self.get_best_move(new_state, pieces_locations_human)
-				if  move_value > maxim:
-					maxim = move_value
-					move_maxim = move
-					old_position = pieces_locations_calc[index]
+			if piece[0] != 3:
+				for move in moves:
+					new_state[index] = move
+					move_value = self.get_best_move(new_state, pieces_locations_human)
+					if  move_value > maxim:
+						maxim = move_value
+						move_maxim = move
+						print(maxim, move_maxim)
+						old_position = pieces_locations_calc[index]
 		self.update_matrix(move_maxim[0], move_maxim[1], old_position, 'c')
 		self.update_interface(move_maxim[0], move_maxim[1], old_position, 'c')
-		self.turn = 'h'
+		if self.final_state_c():
+			showerror("Game Over!", "You lost the game!")
+		else:
+			self.turn = 'h'
+
 
 	def mouse_click(self, event):
 		row, col = self.mouse_calc(event.x, event.y)
@@ -51,23 +61,34 @@ class ChekersGame(object):
 				if self.board_with_pieces[row][col] == "h":
 					self.selected_piece = (row, col)
 			else:
-				if self.legal_move(row, col):
+				if self.board_with_pieces[row][col] == "h":
+					self.selected_piece = (row, col)
+				elif self.legal_move(row, col):
 					self.update_matrix(row, col, self.selected_piece, 'h')
 					self.update_interface(row, col, self.selected_piece, 'h')
 					self.turn = "c"
 					self.selected_piece = []
-					self.ai_one_level()
+					if self.final_state_h():
+						showinfo("Congratulation!", "You win!")
+					else:
+						self.ai_one_level()
 
-	def final_state(self):
-		computer_pieces = sum(
-			[1 for i in range(self.dimension) if self.board_with_pieces[self.dimension - 1][i] == 'c'])
-		human_pieces = sum([1 for i in range(self.dimension) if self.board_with_pieces[self.dimension - 1][i] == 'h'])
-		if computer_pieces == self.dimension:
-			return True, 'c'
-		elif human_pieces == self.dimension:
-			return True, 'h'
-		else:
-			return False, None
+	def final_state_c(self):
+		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								 self.board_with_pieces[i][j] == 'c']
+		for piece in pieces_locations_calc:
+			if piece[0] != self.dimension - 1:
+				return False
+		return True
+
+
+	def final_state_h(self):
+		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								  self.board_with_pieces[i][j] == 'h']
+		for piece in pieces_locations_human:
+			if piece[0] != 0:
+				return False
+		return True
 
 	def update_interface(self, row, col, old_position, who_moved):
 		old_row, old_col = old_position[0], old_position[1]
@@ -82,6 +103,7 @@ class ChekersGame(object):
 		old_row, old_col = old_position[0], old_position[1]
 		self.board_with_pieces[row][col] = who_moved
 		self.board_with_pieces[old_row][old_col] = (old_row + old_col) % 2
+		print(self.board_with_pieces)
 
 	def check_move(self, row, col):
 		return True if (0 <= col < self.dimension) and (0 <= row < self.dimension) and (
@@ -153,6 +175,7 @@ class ChekersGame(object):
 
 	def __init__(self, root):
 		self.win = False
+		self.root = root
 		self.turn = "h"
 		self.selected_piece = []
 		self.dimension = 4
