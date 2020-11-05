@@ -3,7 +3,6 @@ import random
 from copy import deepcopy
 from tkinter import *
 from tkinter.messagebox import showerror, showinfo, showwarning
-import time
 
 
 class CheckersGame(object):
@@ -30,28 +29,51 @@ class CheckersGame(object):
 
 	def check_remaining_moves(self, who):
 		pieces_locations = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								 self.board_with_pieces[i][j] == who]
+							self.board_with_pieces[i][j] == who]
 		moves = []
 		for index, piece in enumerate(pieces_locations):
 			moves.append(self.get_valid_moves(piece[0], piece[1]))
 		return False if len(moves) == 0 else True
 
 	def cost_state(self, state):
-		calculator_pieces  = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								 state[i][j] == 'c']
-		human_pieces  = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								 state[i][j] == 'h']
-		return sum([piece_c[0] for piece_c in calculator_pieces]) - sum([piece_h[0] for piece_h in human_pieces])
-
-
-	def minimax_search(self, curDepth, state, maxTurn, targetDepth, maxi, mini):
 		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							 state[i][j] == 'c']
 		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
-		if curDepth == targetDepth or self.final_state_c() or not self.check_remaining_moves('c'):
-			return self.cost_state(state)
+		return sum([piece_c[0] for piece_c in calculator_pieces]) - sum([piece_h[0] for piece_h in human_pieces])
+
+	def make_best_move(self):
+		if self.check_remaining_moves('c'):
+			best_move = self.minimax_search(0, self.board_with_pieces, True, 3, -math.inf, math.inf)
+			old_position, new_position = best_move[1], best_move[2]
+			self.update_matrix(new_position[0], new_position[1], old_position, "c")
+			self.update_interface(new_position[0], new_position[1], old_position, "c")
+			if self.final_state_c():
+				showerror("Game Over!", "You lost the game!")
+			else:
+				self.turn = 'h'
+		else:
+			if self.check_winner() == 'c':
+				showerror("Game Over!", "You lost the game!")
+			elif self.check_winner() == 'h':
+				showinfo("Congratulation!", "You win!")
+			else:
+				showinfo("Tie", "It's a tie")
+
+	def minimax_search(self, curDepth, state, maxTurn, targetDepth, alpha, beta):
+		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+							 state[i][j] == 'c']
+		random.shuffle(calculator_pieces)
+		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+						state[i][j] == 'h']
+		if curDepth == targetDepth or self.final_state_c():
+			return self.cost_state(state), state
+		if not self.check_remaining_moves('c'):
+			return 0
 		if maxTurn:
+			maxi = -math.inf
+			old_piece = []
+			move_piece = []
 			for index, piece in enumerate(calculator_pieces):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				if piece[0] != 3:
@@ -59,30 +81,39 @@ class CheckersGame(object):
 						new_state = deepcopy(state)
 						new_state[move[0]][move[1]] = 'c'
 						new_state[piece[0]][piece[1]] = (piece[0] + piece[1]) % 2
-						result = self.minimax_search(curDepth + 1, new_state, False, targetDepth, maxi, mini)
+						result = self.minimax_search(curDepth + 1, new_state, False, targetDepth, alpha, beta)
 						if result > maxi:
 							maxi = result
-							state_maxi = state
-			return maxi
+							move_piece = move
+							old_piece = piece
+						alpha = max(alpha, maxi)
+						if beta <= alpha:
+							break
+			return maxi, old_piece, move_piece
 		else:
+			mini = math.inf
 			for index, piece in enumerate(human_pieces):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				for move in moves:
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]] = 'h'
 					new_state[piece[0]][piece[1]] = (piece[0] + piece[1]) % 2
-					result = self.minimax_search(curDepth + 1, new_state, True, targetDepth, maxi, mini)
+					result = self.minimax_search(curDepth + 1, new_state, True, targetDepth, alpha, beta)[0]
 					if result < mini:
 						mini = result
-						state_mini = state
-					print(result)
+						print("Mini", mini)
+					beta = min(beta, mini)
+					if beta <= alpha:
+						break
 			return mini
 
 	def ai_one_level(self):
 		maxim, move_maxim = -math.inf, (-1, -1)
-		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'c']
+		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								 self.board_with_pieces[i][j] == 'c']
 		random.shuffle(pieces_locations_calc)
-		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'h']
+		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								  self.board_with_pieces[i][j] == 'h']
 		if self.check_remaining_moves('c'):
 			for index, piece in enumerate(pieces_locations_calc):
 				moves = self.get_valid_moves(piece[0], piece[1])
@@ -94,7 +125,6 @@ class CheckersGame(object):
 						if move_value > maxim:
 							maxim = move_value
 							move_maxim = move
-							print(maxim, move_maxim)
 							old_position = pieces_locations_calc[index]
 			self.update_matrix(move_maxim[0], move_maxim[1], old_position, 'c')
 			self.update_interface(move_maxim[0], move_maxim[1], old_position, 'c')
@@ -114,12 +144,12 @@ class CheckersGame(object):
 		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 								 self.board_with_pieces[i][j] == 'c']
 		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								 self.board_with_pieces[i][j] == 'c']
+								  self.board_with_pieces[i][j] == 'c']
 		c = pieces_locations_calc.count(lambda x: x[0] == self.dimension - 1)
 		h = pieces_locations_human.count(lambda x: x[0] == 0)
 		if c > h:
 			return "c"
-		elif h >c:
+		elif h > c:
 			return "h"
 		else:
 			return "r"
@@ -142,7 +172,7 @@ class CheckersGame(object):
 						if self.final_state_h():
 							showinfo("Congratulation!", "You win!")
 						else:
-							self.ai_one_level()
+							self.make_best_move()
 			else:
 				if self.check_winner() == 'c':
 					showerror("Game Over!", "You lost the game!")
@@ -154,14 +184,16 @@ class CheckersGame(object):
 			showwarning("Warning!", "Please wait, it's not your turn!")
 
 	def final_state_c(self):
-		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'c']
+		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								 self.board_with_pieces[i][j] == 'c']
 		for piece in pieces_locations_calc:
 			if piece[0] != self.dimension - 1:
 				return False
 		return True
 
 	def final_state_h(self):
-		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if self.board_with_pieces[i][j] == 'h']
+		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								  self.board_with_pieces[i][j] == 'h']
 		for piece in pieces_locations_human:
 			if piece[0] != 0:
 				return False
@@ -179,7 +211,6 @@ class CheckersGame(object):
 		old_row, old_col = old_position[0], old_position[1]
 		self.board_with_pieces[row][col] = who_moved
 		self.board_with_pieces[old_row][old_col] = (old_row + old_col) % 2
-		print(self.board_with_pieces)
 
 	def check_move(self, row, col):
 		return True if (0 <= col < self.dimension) and (0 <= row < self.dimension) and (
@@ -191,7 +222,8 @@ class CheckersGame(object):
 			direction_up, direction_down = -1, 1
 		else:
 			direction_up, direction_down = 1, -1
-		directions = [(1 * direction_up, -1), (1 * direction_up, 0), (1 * direction_up, 1), (0, 1), (1 * direction_down, 1), (1 * direction_down, 0), (1 * direction_down, -1), (0, -1)]
+		directions = [(1 * direction_up, -1), (1 * direction_up, 0), (1 * direction_up, 1), (0, 1),
+					  (1 * direction_down, 1), (1 * direction_down, 0), (1 * direction_down, -1), (0, -1)]
 		for d in directions:
 			if self.check_move(row + d[0], col + d[1]):
 				moves.append([row + d[0], col + d[1]])
@@ -248,7 +280,6 @@ class CheckersGame(object):
 		else:
 			self.canvas.create_oval(x1, y1, x2, y2, fill=color)
 
-
 	def remove(self):
 		self.start_label.destroy()
 		self.menu.destroy()
@@ -263,13 +294,13 @@ class CheckersGame(object):
 			self.turn = "h"
 		else:
 			self.turn = "c"
-			self.minimax_search(0, self.board_with_pieces, True, 2, -math.inf, math.inf)
+			self.make_best_move()
 
 	def start_menu(self):
 		self.root.geometry("400x200")
 		self.start_label = Label(self.root,
-									   text="Who start?",
-									   font=("Arial Bold", 15))
+								 text="Who start?",
+								 font=("Arial Bold", 15))
 		self.start_label.pack()
 		self.default = StringVar(self.root)
 		self.default.set("Human")
@@ -290,4 +321,3 @@ class CheckersGame(object):
 		self.board = [[0 if (i + j) % 2 == 0 else 1 for i in range(self.dimension)] for j in range(self.dimension)]
 		self.board_with_pieces = [[]]
 		self.start_menu()
-
