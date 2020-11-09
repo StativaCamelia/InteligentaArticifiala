@@ -40,11 +40,10 @@ class CheckersGame(object):
 	def sigmoid(self, z):
 		return 1/(1 + np.exp(-z))
 
-
 	def cost_state(self, state):
 		calculator_pieces_new_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							 state[i][j] == 'c']
-		human_pieces_new_state = [[i, j]  for i in range(self.dimension) for j in range(self.dimension) if
+		human_pieces_new_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
 		calculator_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 									   self.board_with_pieces[i][j] == 'c']
@@ -66,11 +65,11 @@ class CheckersGame(object):
 				human_costs.append(4)
 			elif piece_new[0] == 0 and piece_new[0] != piece_old[0]:
 				human_costs.append(8)
-			elif piece_new[0] < piece_old[0]:
+			elif piece_new[0] > piece_old[0]:
 				human_costs.append(-2)
 			else:
 				human_costs.append(3)
-		return (sum([i for i in human_costs]) - sum([j for j in human_costs]))
+		return sum([i for i in calculator_costs]) - sum([j for j in human_costs])
 
 	def fitness(self, state):
 		return self.cost_state(state) - self.cost_state(self.board_with_pieces)
@@ -83,13 +82,42 @@ class CheckersGame(object):
 		else:
 			showinfo("Tie", "It's a tie")
 
-
 	def make_best_move(self):
+		# if self.check_remaining_moves('c'):
+		# 	best_move = self.minimax_search(0, self.board_with_pieces, True, 4, -math.inf, math.inf)
+		# 	old_position, new_position = best_move[1], best_move[2]
+		# 	self.update_matrix(new_position[0], new_position[1], old_position, "c")
+		# 	self.update_interface(new_position[0], new_position[1], old_position, "c")
+		# 	if self.final_state_c():
+		# 		showerror("Game Over!", "You lost the game!")
+		# 	else:
+		# 		self.turn = 'h'
+		# else:
+		# 	self.get_winner_on_block()
 		if self.check_remaining_moves('c'):
-			best_move = self.minimax_search(0, self.board_with_pieces, True, 4, -math.inf, math.inf)
-			old_position, new_position = best_move[1], best_move[2]
-			self.update_matrix(new_position[0], new_position[1], old_position, "c")
-			self.update_interface(new_position[0], new_position[1], old_position, "c")
+			best_val = -math.inf
+			best_move_row = -1
+			best_move_col = -1
+			old_row = -1
+			old_col = -1
+			calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+								 self.board_with_pieces[i][j] == 'c']
+			for index, piece in enumerate(calculator_pieces):
+				moves = self.get_valid_moves(piece[0], piece[1])
+				for move in moves:
+					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
+					move_val = self.minimax_search(0, self.board_with_pieces, True, 4,  -math.inf, math.inf)
+					print("before: ", self.board_with_pieces)
+					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = (piece[0] + piece[1]) % 2, 'c'
+					if move_val > best_val:
+						best_move_row = move[0]
+						best_move_col = move[1]
+						old_row = piece[0]
+						old_col = piece[1]
+						best_val = move_val
+			self.update_matrix(best_move_row, best_move_col, [old_row, old_col], "c")
+			self.update_interface(best_move_row, best_move_col, [old_row, old_col], "c")
+			print(self.board_with_pieces)
 			if self.final_state_c():
 				showerror("Game Over!", "You lost the game!")
 			else:
@@ -100,31 +128,32 @@ class CheckersGame(object):
 	def minimax_search(self, curDepth, state, maxTurn, targetDepth, alpha, beta):
 		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							 state[i][j] == 'c']
-		calculator_pieces.sort(key=lambda x: x[0])
 		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
 		if curDepth == targetDepth or self.final_state_c():
-			return self.fitness(state), state
+			return self.fitness(state)
 		if not self.check_remaining_moves('c'):
 			return 0
 		if maxTurn:
 			maxi = -math.inf
-			old_piece = []
-			move_piece = []
+			# old_piece = []
+			# move_piece = []
 			for index, piece in enumerate(calculator_pieces):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				for move in moves:
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
-					result = self.minimax_search(curDepth + 1, new_state, False, targetDepth, alpha, beta)
-					if result > maxi:
-						maxi = result
-						move_piece = move
-						old_piece = piece
+					# state[move[0]][move[1]], state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
+					maxi = max(self.minimax_search(curDepth + 1, new_state, False, targetDepth, alpha, beta), maxi)
+					# if result > maxi:
+					# 	maxi = result
+					# 	move_piece = move
+					# 	old_piece = piece
 					alpha = max(alpha, maxi)
 					if beta <= alpha:
 						break
-			return maxi, old_piece, move_piece
+			# return maxi, old_piece, move_piece
+			return maxi
 		else:
 			mini = math.inf
 			for index, piece in enumerate(human_pieces):
@@ -132,9 +161,8 @@ class CheckersGame(object):
 				for move in moves:
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
-					result = self.minimax_search(curDepth + 1, new_state, True, targetDepth, alpha, beta)[0]
-					if result < mini:
-						mini = result
+					# state[move[0]][move[1]], state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
+					mini = min(self.minimax_search(curDepth + 1, new_state, True, targetDepth, alpha, beta), mini)
 					beta = min(beta, mini)
 					if beta <= alpha:
 						break
@@ -246,8 +274,7 @@ class CheckersGame(object):
 			direction_up, direction_down = -1, 1
 		else:
 			direction_up, direction_down = 1, -1
-		directions = [(1 * direction_up, -1), (1 * direction_up, 0), (1 * direction_up, 1), (0, 1),
-					  (1 * direction_down, 1), (1 * direction_down, 0), (1 * direction_down, -1), (0, -1)]
+		directions = [(1 * direction_up, 0), (1 * direction_up, -1), (1 * direction_up, 1), (0, 1), (0, -1), (1 * direction_down, 0), (1 * direction_down, -1), (1 * direction_down, 1)]
 		for d in directions:
 			if self.check_move(row + d[0], col + d[1]):
 				moves.append([row + d[0], col + d[1]])
