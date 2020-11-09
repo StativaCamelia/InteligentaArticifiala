@@ -27,7 +27,8 @@ class CheckersGame(object):
 		return "black" if (row + col) % 2 else "white"
 
 	def get_best_move(self, new_state, opposer_state):
-		return sum([piece_c[0] for piece_c in new_state]) - sum([piece_h[0] for piece_h in opposer_state])
+		return (sum([piece_c[0] for piece_c in new_state]) - sum([piece_h[0] for piece_h in opposer_state])) ** 2
+
 
 	def check_remaining_moves(self, who):
 		pieces_locations = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
@@ -37,39 +38,37 @@ class CheckersGame(object):
 			moves.append(self.get_valid_moves(piece[0], piece[1]))
 		return False if len(moves) == 0 else True
 
-	def sigmoid(self, z):
-		return 1/(1 + np.exp(-z))
 
 	def cost_state(self, state):
 		calculator_pieces_new_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							 state[i][j] == 'c']
 		human_pieces_new_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
-		calculator_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-									   self.board_with_pieces[i][j] == 'c']
-		human_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								  self.board_with_pieces[i][j] == 'h']
-		calculator_costs = []
-		for piece_new, piece_old in zip(calculator_pieces_new_state, calculator_pieces_old_state):
-			if piece_new[0] == 3 and piece_new[0] == piece_old[0]:
-				calculator_costs.append(4)
-			elif piece_new[0] == 3 and piece_new[0] != piece_old[0]:
-				calculator_costs.append(8)
-			elif piece_new[0] < piece_old[0]:
-				calculator_costs.append(-2)
-			else:
-				calculator_costs.append(3)
-		human_costs = []
-		for piece_new, piece_old in zip(human_pieces_new_state, human_pieces_old_state):
-			if piece_new[0] == 0 and piece_new[0] == piece_old[0]:
-				human_costs.append(4)
-			elif piece_new[0] == 0 and piece_new[0] != piece_old[0]:
-				human_costs.append(8)
-			elif piece_new[0] > piece_old[0]:
-				human_costs.append(-2)
-			else:
-				human_costs.append(3)
-		return sum([i for i in calculator_costs]) - sum([j for j in human_costs])
+		# calculator_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+		# 							   self.board_with_pieces[i][j] == 'c']
+		# human_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+		# 						  self.board_with_pieces[i][j] == 'h']
+		# calculator_costs = []
+		# for piece_new, piece_old in zip(calculator_pieces_new_state, calculator_pieces_old_state):
+		# 	if piece_new[0] == 3 and piece_new[0] == piece_old[0]:
+		# 		calculator_costs.append(4)
+		# 	elif piece_new[0] == 3 and piece_new[0] != piece_old[0]:
+		# 		calculator_costs.append(8)
+		# 	elif piece_new[0] < piece_old[0]:
+		# 		calculator_costs.append(-2)
+		# 	else:
+		# 		calculator_costs.append(3)
+		# human_costs = []
+		# for piece_new, piece_old in zip(human_pieces_new_state, human_pieces_old_state):
+		# 	if piece_new[0] == 0 and piece_new[0] == piece_old[0]:
+		# 		human_costs.append(4)
+		# 	elif piece_new[0] == 0 and piece_new[0] != piece_old[0]:
+		# 		human_costs.append(8)
+		# 	elif piece_new[0] > piece_old[0]:
+		# 		human_costs.append(-2)
+		# 	else:
+		# 		human_costs.append(3)
+		return self.get_best_move(calculator_pieces_new_state, human_pieces_new_state)
 
 	def fitness(self, state):
 		return self.cost_state(state) - self.cost_state(self.board_with_pieces)
@@ -83,17 +82,6 @@ class CheckersGame(object):
 			showinfo("Tie", "It's a tie")
 
 	def make_best_move(self):
-		# if self.check_remaining_moves('c'):
-		# 	best_move = self.minimax_search(0, self.board_with_pieces, True, 4, -math.inf, math.inf)
-		# 	old_position, new_position = best_move[1], best_move[2]
-		# 	self.update_matrix(new_position[0], new_position[1], old_position, "c")
-		# 	self.update_interface(new_position[0], new_position[1], old_position, "c")
-		# 	if self.final_state_c():
-		# 		showerror("Game Over!", "You lost the game!")
-		# 	else:
-		# 		self.turn = 'h'
-		# else:
-		# 	self.get_winner_on_block()
 		if self.check_remaining_moves('c'):
 			best_val = -math.inf
 			best_move_row = -1
@@ -102,12 +90,12 @@ class CheckersGame(object):
 			old_col = -1
 			calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 								 self.board_with_pieces[i][j] == 'c']
+			random.shuffle(calculator_pieces)
 			for index, piece in enumerate(calculator_pieces):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				for move in moves:
 					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
 					move_val = self.minimax_search(0, self.board_with_pieces, True, 4,  -math.inf, math.inf)
-					print("before: ", self.board_with_pieces)
 					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = (piece[0] + piece[1]) % 2, 'c'
 					if move_val > best_val:
 						best_move_row = move[0]
@@ -117,7 +105,6 @@ class CheckersGame(object):
 						best_val = move_val
 			self.update_matrix(best_move_row, best_move_col, [old_row, old_col], "c")
 			self.update_interface(best_move_row, best_move_col, [old_row, old_col], "c")
-			print(self.board_with_pieces)
 			if self.final_state_c():
 				showerror("Game Over!", "You lost the game!")
 			else:
@@ -128,31 +115,25 @@ class CheckersGame(object):
 	def minimax_search(self, curDepth, state, maxTurn, targetDepth, alpha, beta):
 		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							 state[i][j] == 'c']
+		calculator_pieces.sort(key = lambda x: x[0])
+		random.shuffle(calculator_pieces)
 		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
 		if curDepth == targetDepth or self.final_state_c():
-			return self.fitness(state)
+			return self.cost_state(state)
 		if not self.check_remaining_moves('c'):
 			return 0
 		if maxTurn:
 			maxi = -math.inf
-			# old_piece = []
-			# move_piece = []
 			for index, piece in enumerate(calculator_pieces):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				for move in moves:
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
-					# state[move[0]][move[1]], state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
 					maxi = max(self.minimax_search(curDepth + 1, new_state, False, targetDepth, alpha, beta), maxi)
-					# if result > maxi:
-					# 	maxi = result
-					# 	move_piece = move
-					# 	old_piece = piece
 					alpha = max(alpha, maxi)
 					if beta <= alpha:
 						break
-			# return maxi, old_piece, move_piece
 			return maxi
 		else:
 			mini = math.inf
@@ -161,7 +142,6 @@ class CheckersGame(object):
 				for move in moves:
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
-					# state[move[0]][move[1]], state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
 					mini = min(self.minimax_search(curDepth + 1, new_state, True, targetDepth, alpha, beta), mini)
 					beta = min(beta, mini)
 					if beta <= alpha:
