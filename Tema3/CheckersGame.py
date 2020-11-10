@@ -4,8 +4,6 @@ from copy import deepcopy
 from tkinter import *
 from tkinter.messagebox import showerror, showinfo, showwarning
 
-import numpy as np
-
 
 class CheckersGame(object):
 	def init_board_with_pieces(self):
@@ -29,7 +27,6 @@ class CheckersGame(object):
 	def get_best_move(self, new_state, opposer_state):
 		return sum([piece_c[0]**2 if piece_c[0] >= 2 else piece_c[0] * 0.75 for piece_c in new_state]) - sum([piece_h[0]**2  if piece_h[0] <= 2 else piece_h[0]*0.75 for piece_h in opposer_state])
 
-
 	def check_remaining_moves(self, who):
 		pieces_locations = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							self.board_with_pieces[i][j] == who]
@@ -37,7 +34,6 @@ class CheckersGame(object):
 		for index, piece in enumerate(pieces_locations):
 			moves.append(self.get_valid_moves(piece[0], piece[1]))
 		return False if len(moves) == 0 else True
-
 
 	def cost_state(self, state):
 		calculator_pieces_new_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
@@ -89,7 +85,7 @@ class CheckersGame(object):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				for move in moves:
 					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
-					move_val = self.minimax_search(0, self.board_with_pieces, True, 4,  -math.inf, math.inf)
+					move_val = self.minimax_search(0, self.board_with_pieces, True, 4)
 					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = (piece[0] + piece[1]) % 2, 'c'
 					if move_val > best_val:
 						best_move_row = move[0]
@@ -106,47 +102,11 @@ class CheckersGame(object):
 		else:
 			self.get_winner_on_block()
 
-	def minimax_search_alpha_beta(self, curDepth, state, maxTurn, targetDepth, alpha, beta):
-		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-							 state[i][j] == 'c']
-		calculator_pieces.sort(key = lambda x: x[0])
-		random.shuffle(calculator_pieces)
-		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-						state[i][j] == 'h']
-		if curDepth == targetDepth or self.final_state_c():
-			return self.cost_state(state)
-		if not self.check_remaining_moves('c'):
-			return 0
-		if maxTurn:
-			maxi = -math.inf
-			for index, piece in enumerate(calculator_pieces):
-				moves = self.get_valid_moves(piece[0], piece[1])
-				for move in moves:
-					new_state = deepcopy(state)
-					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
-					maxi = max(self.minimax_search(curDepth + 1, new_state, False, targetDepth, alpha, beta), maxi)
-					alpha = max(alpha, maxi)
-					if beta <= alpha:
-						break
-			return maxi
-		else:
-			mini = math.inf
-			for index, piece in enumerate(human_pieces):
-				moves = self.get_valid_moves(piece[0], piece[1])
-				for move in moves:
-					new_state = deepcopy(state)
-					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
-					mini = min(self.minimax_search(curDepth + 1, new_state, True, targetDepth, alpha, beta), mini)
-					beta = min(beta, mini)
-					if beta <= alpha:
-						break
-			return mini
-
 
 	def minimax_search(self, curDepth, state, maxTurn, targetDepth):
 		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 							 state[i][j] == 'c']
-		calculator_pieces.sort(key = lambda x: x[0])
+		# calculator_pieces.sort(key=lambda x: x[0])
 		random.shuffle(calculator_pieces)
 		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
@@ -162,6 +122,9 @@ class CheckersGame(object):
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
 					maxi = max(self.minimax_search(curDepth + 1, new_state, False, targetDepth), maxi)
+					self.alpha = max(self.alpha, maxi)
+					if self.beta <= self.alpha:
+						break
 			return maxi
 		else:
 			mini = math.inf
@@ -170,9 +133,9 @@ class CheckersGame(object):
 				for move in moves:
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
-					mini = min(self.minimax_search(curDepth + 1, new_state, True, targetDepth, alpha, beta), mini)
-					beta = min(beta, mini)
-					if beta <= alpha:
+					mini = min(self.minimax_search(curDepth + 1, new_state, True, targetDepth), mini)
+					self.beta = min(self.beta, mini)
+					if self.beta <= self.alpha:
 						break
 			return mini
 
@@ -206,12 +169,12 @@ class CheckersGame(object):
 			self.get_winner_on_block()
 
 	def check_winner(self):
-		pieces_locations_calc = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+		pieces_locations_calc = [i for i in range(self.dimension) for j in range(self.dimension) if
 								 self.board_with_pieces[i][j] == 'c']
-		pieces_locations_human = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+		pieces_locations_human = [i for i in range(self.dimension) for j in range(self.dimension) if
 								  self.board_with_pieces[i][j] == 'c']
-		c = pieces_locations_calc.count(lambda x: x[0] == self.dimension - 1)
-		h = pieces_locations_human.count(lambda x: x[0] == 0)
+		c = pieces_locations_calc.count(self.dimension - 1)
+		h = pieces_locations_human.count(0)
 		if c > h:
 			return "c"
 		elif h > c:
@@ -378,4 +341,6 @@ class CheckersGame(object):
 		self.human_color = "red"
 		self.board = [[0 if (i + j) % 2 == 0 else 1 for i in range(self.dimension)] for j in range(self.dimension)]
 		self.board_with_pieces = [[]]
+		self.alpha = -math.inf
+		self.beta = math.inf
 		self.start_menu()
