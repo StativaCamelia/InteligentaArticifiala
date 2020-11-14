@@ -40,23 +40,18 @@ class CheckersGame(object):
 							 state[i][j] == 'c']
 		human_pieces_new_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
 						state[i][j] == 'h']
-		calculator_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-									   self.board_with_pieces[i][j] == 'c']
-		human_pieces_old_state = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
-								  self.board_with_pieces[i][j] == 'h']
-
 		calculator_costs = []
-		for piece_new, piece_old in zip(calculator_pieces_new_state, calculator_pieces_old_state):
-			if piece_new[0] > 2:
-				calculator_costs.append(5)
+		for piece_new in calculator_pieces_new_state:
+			if piece_new[0] >= 2:
+				calculator_costs.append(piece_new[0] * 3)
 			else:
-				calculator_costs.append(2)
+				calculator_costs.append(piece_new[0] * 0.5)
 		human_costs = []
-		for piece_new, piece_old in zip(human_pieces_new_state, human_pieces_old_state):
-			if piece_new[0] < 2:
-				human_costs.append(5)
+		for piece_new in human_pieces_new_state:
+			if piece_new[0] <= 2:
+				human_costs.append(piece_new[0])
 			else:
-				human_pieces_old_state.append(2)
+				human_costs.append(piece_new[0] * 0.25)
 		return sum(calculator_costs) - sum(human_costs)
 
 
@@ -85,7 +80,7 @@ class CheckersGame(object):
 				moves = self.get_valid_moves(piece[0], piece[1])
 				for move in moves:
 					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
-					move_val = self.minimax_search(0, self.board_with_pieces, True, 4)
+					move_val = self.minimax_search_alpha_beta(0, self.board_with_pieces, True, 4)
 					self.board_with_pieces[move[0]][move[1]], self.board_with_pieces[piece[0]][piece[1]] = (piece[0] + piece[1]) % 2, 'c'
 					if move_val > best_val:
 						best_move_row = move[0]
@@ -102,6 +97,42 @@ class CheckersGame(object):
 		else:
 			self.get_winner_on_block()
 
+
+	def minimax_search_alpha_beta(self, curDepth, state, maxTurn, targetDepth):
+		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+							 state[i][j] == 'c']
+		calculator_pieces.sort(key=lambda x: x[0])
+		random.shuffle(calculator_pieces)
+		human_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
+						state[i][j] == 'h']
+		if curDepth == targetDepth or self.final_state_c():
+			return self.cost_state(state)
+		if not self.check_remaining_moves('c'):
+			return 0
+		if maxTurn:
+			maxi = -math.inf
+			for index, piece in enumerate(calculator_pieces):
+				moves = self.get_valid_moves(piece[0], piece[1])
+				for move in moves:
+					new_state = deepcopy(state)
+					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
+					maxi = max(self.minimax_search_alpha_beta(curDepth + 1, new_state, False, targetDepth), maxi)
+					self.alpha = max(self.alpha, maxi)
+					if self.beta <= self.alpha:
+						break
+			return maxi
+		else:
+			mini = math.inf
+			for index, piece in enumerate(human_pieces):
+				moves = self.get_valid_moves(piece[0], piece[1])
+				for move in moves:
+					new_state = deepcopy(state)
+					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
+					mini = min(self.minimax_search_alpha_beta(curDepth + 1, new_state, True, targetDepth), mini)
+					self.beta = min(self.beta, mini)
+					if self.beta <= self.alpha:
+						break
+			return mini
 
 	def minimax_search(self, curDepth, state, maxTurn, targetDepth):
 		calculator_pieces = [[i, j] for i in range(self.dimension) for j in range(self.dimension) if
@@ -122,9 +153,6 @@ class CheckersGame(object):
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'c', (piece[0] + piece[1]) % 2
 					maxi = max(self.minimax_search(curDepth + 1, new_state, False, targetDepth), maxi)
-					self.alpha = max(self.alpha, maxi)
-					if self.beta <= self.alpha:
-						break
 			return maxi
 		else:
 			mini = math.inf
@@ -134,9 +162,6 @@ class CheckersGame(object):
 					new_state = deepcopy(state)
 					new_state[move[0]][move[1]], new_state[piece[0]][piece[1]] = 'h', (piece[0] + piece[1]) % 2
 					mini = min(self.minimax_search(curDepth + 1, new_state, True, targetDepth), mini)
-					self.beta = min(self.beta, mini)
-					if self.beta <= self.alpha:
-						break
 			return mini
 
 
