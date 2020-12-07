@@ -70591,6 +70591,10 @@
         <Class IRI="http://cso.kmi.open.ac.uk/schema/cso#Topic"/>
     </SubClassOf>
     <ClassAssertion>
+        <Class IRI="#Neural_Networks"/>
+        <NamedIndividual IRI="http://yago-knowledge.org/resource/Perceptron"/>
+    </ClassAssertion>
+    <ClassAssertion>
         <Class IRI="#Uninformed_Strategy"/>
         <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
     </ClassAssertion>
@@ -70603,13 +70607,14 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/markov_decision_process"/>
     </ClassAssertion>
     <ClassAssertion>
-        <Class IRI="#Neural_Networks"/>
-        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multilayer_perceptron"/>
-    </ClassAssertion>
-    <ClassAssertion>
         <Class IRI="#Game_Theory"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
     </ClassAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#is_a"/>
+        <NamedIndividual IRI="http://yago-knowledge.org/resource/Perceptron"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/neural_network_model"/>
+    </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#has_a"/>
         <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
