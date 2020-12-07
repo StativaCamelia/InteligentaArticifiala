@@ -51317,9 +51317,6 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multihop_wireless_networks"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multilayer_perceptron"/>
-    </Declaration>
-    <Declaration>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multilingualism"/>
     </Declaration>
     <Declaration>
@@ -70631,25 +70628,10 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/markov_process"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#has_a"/>
-        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multilayer_perceptron"/>
-        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/back_propagation_algorithm"/>
-    </ObjectPropertyAssertion>
-    <ObjectPropertyAssertion>
         <ObjectProperty IRI="#has"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto-optimal_sets"/>
     </ObjectPropertyAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>https://cso.kmi.open.ac.uk/topics/multilayer_perceptron</IRI>
-        <IRI>https://academic.microsoft.com/topic/179717631</IRI>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>https://cso.kmi.open.ac.uk/topics/multilayer_perceptron</IRI>
-        <Literal xml:lang="en">multilayer perceptron</Literal>
-    </AnnotationAssertion>
 </Ontology>
 
 
