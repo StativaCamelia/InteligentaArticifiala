@@ -47,6 +47,9 @@
         <ObjectProperty IRI="#is_an"/>
     </Declaration>
     <Declaration>
+        <ObjectProperty IRI="#is_part_of"/>
+    </Declaration>
+    <Declaration>
         <NamedIndividual IRI="http://dbpedia.org/resource/ACT-R"/>
     </Declaration>
     <Declaration>
@@ -15782,7 +15785,7 @@
         <NamedIndividual IRI="http://sw.cyc.com/concept/Mx4rwauQZNc8Qdibm_jCfd9X4g"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="#alpha-beta_pruning"/>
+        <NamedIndividual IRI="#alpha_beta_pruning"/>
     </Declaration>
     <Declaration>
         <NamedIndividual IRI="#backtracking"/>
@@ -70615,12 +70618,24 @@
         <NamedIndividual IRI="#minimax_algorithm"/>
     </ClassAssertion>
     <ClassAssertion>
+        <Class IRI="#Uninformed_Strategy"/>
+        <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Informed_Strategy"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/greedy_randomized_adaptive_search_procedure"/>
+    </ClassAssertion>
+    <ClassAssertion>
         <Class IRI="#Reinforcement_Learning"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/markov_decision_process"/>
     </ClassAssertion>
     <ClassAssertion>
         <Class IRI="#Neural_Networks"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multilayer_perceptron"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Game_Theory"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
     </ClassAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#is_an"/>
@@ -70635,7 +70650,17 @@
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#can_have"/>
         <NamedIndividual IRI="#minimax_algorithm"/>
-        <NamedIndividual IRI="#alpha-beta_pruning"/>
+        <NamedIndividual IRI="#alpha_beta_pruning"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#has_a"/>
+        <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/validation_process"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#is_part_of"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/greedy_randomized_adaptive_search_procedure"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/heuristic_search_algorithms"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#has"/>
@@ -70647,24 +70672,20 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/multilayer_perceptron"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/back_propagation_algorithm"/>
     </ObjectPropertyAssertion>
-    <AsymmetricObjectProperty>
-        <ObjectProperty IRI="#is_a"/>
-    </AsymmetricObjectProperty>
-    <TransitiveObjectProperty>
-        <ObjectProperty IRI="#is_a"/>
-    </TransitiveObjectProperty>
-    <IrreflexiveObjectProperty>
-        <ObjectProperty IRI="#is_a"/>
-    </IrreflexiveObjectProperty>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#has"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto-optimal_sets"/>
+    </ObjectPropertyAssertion>
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>#alpha-beta_pruning</IRI>
+        <IRI>#alpha_beta_pruning</IRI>
         <IRI>https://academic.microsoft.com/topic/19001118</IRI>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#alpha-beta_pruning</IRI>
-        <Literal xml:lang="en">alpha-beta pruning</Literal>
+        <IRI>#alpha_beta_pruning</IRI>
+        <Literal xml:lang="en">alpha beta pruning</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://schema.org/relatedLink"/>
