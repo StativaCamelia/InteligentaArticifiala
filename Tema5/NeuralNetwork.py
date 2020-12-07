@@ -1,3 +1,4 @@
+import math
 import random
 
 import numpy as np
@@ -18,6 +19,7 @@ class NeuralNetwork:
 
 	def initialize_weights(self):
 		self.weights = [np.random.randn(self.layers_sizes[i], self.layers_sizes[i - 1]) for i in range(1, len(self.layers_sizes))]
+		print(self.weights)
 
 	def initialize_biases(self):
 		self.biases = [np.random.randn(self.layers_sizes[i], 1) for i in range(1, len(self.layers_sizes))]
@@ -33,9 +35,15 @@ class NeuralNetwork:
 			activations.append(activation_predecesor.T)
 		return net_inputs, activations
 
-	@staticmethod
-	def error_last_layer(output, target):
-		return sigmoid_activation(output)*(output-target)
+	def get_output(self, x):
+		activation = x.reshape(2, 1)
+		for i in range(len(self.layers_sizes) - 1):
+			net_input = np.dot(self.weights[i], activation) + self.biases[i]
+			activation = sigmoid_activation(net_input)
+		return activation
+
+	def error_last_layer(self, output, target):
+		return self.sigmoid_derivative(output)*(output-target)
 
 	def backward(self, net_inputs, activations, label):
 		changes_w, changes_b = [np.zeros(w.shape) for w in self.weights], [np.zeros(b.shape) for b in self.biases]
@@ -55,14 +63,27 @@ class NeuralNetwork:
 
 	def train(self):
 		inputs = self.get_inputs()
-		for i in range(self.no_of_epochs):
+		epoch = 0
+		while epoch < self.no_of_epochs:
+			results = []
+			delta_w, delta_b = [np.zeros(w.shape) for w in self.weights], [np.zeros(b.shape) for b in self.biases]
 			for i in range(4):
 				net_inputs, activations = self.feed_forward(inputs[i])
 				changes_b, changes_w = self.backward(net_inputs, activations, self.labels[i])
-				self.weights = [w - nw * (self.learning_rate/4) for w, nw in zip(self.weights, changes_w)]
-				self.biases = [b - nb * (self.learning_rate/4) for b, nb in zip(self.biases, changes_b)]
+				delta_w = [dw + nw for dw, nw in zip(delta_w, changes_w)]
+				delta_b = [db + nb for db, nb in zip(delta_b, changes_b)]
+				results.append(self.get_output(inputs[i]))
+			self.weights = [w - nw * (self.learning_rate/4) for w, nw in zip(self.weights, delta_w)]
+			self.biases = [b - nb * (self.learning_rate/4) for b, nb in zip(self.biases, delta_b)]
+			epoch += 1
+			error = self.loss(results, self.labels)
+			print(error)
 		self.accuracy()
 
+	def loss(self, y, t):
+		return np.mean((np.array(t) - np.array(y)) ** 2)
+
 	def accuracy(self):
-		results = [0 if self.feed_forward(x)[1][-1] < 0.5 else 1 for x in self.get_inputs()]
+		random.shuffle(self.get_inputs())
+		results = [(x,0) if self.get_output(x) < 0.5 else (x, 1) for x in self.get_inputs()]
 		print(results)
