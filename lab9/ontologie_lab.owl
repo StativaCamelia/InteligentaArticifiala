@@ -15785,15 +15785,6 @@
         <NamedIndividual IRI="http://sw.cyc.com/concept/Mx4rwauQZNc8Qdibm_jCfd9X4g"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="#backtracking"/>
-    </Declaration>
-    <Declaration>
-        <NamedIndividual IRI="#bellman_equations"/>
-    </Declaration>
-    <Declaration>
-        <NamedIndividual IRI="#hillclimbing"/>
-    </Declaration>
-    <Declaration>
         <NamedIndividual IRI="#minimax_algorithm"/>
     </Declaration>
     <Declaration>
@@ -70604,18 +70595,6 @@
     </SubClassOf>
     <ClassAssertion>
         <Class IRI="#Uninformed_Strategy"/>
-        <NamedIndividual IRI="#backtracking"/>
-    </ClassAssertion>
-    <ClassAssertion>
-        <Class IRI="#Informed_Strategy"/>
-        <NamedIndividual IRI="#hillclimbing"/>
-    </ClassAssertion>
-    <ClassAssertion>
-        <Class IRI="#Game_Theory"/>
-        <NamedIndividual IRI="#minimax_algorithm"/>
-    </ClassAssertion>
-    <ClassAssertion>
-        <Class IRI="#Uninformed_Strategy"/>
         <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
     </ClassAssertion>
     <ClassAssertion>
@@ -70635,16 +70614,6 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
     </ClassAssertion>
     <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#is_an"/>
-        <NamedIndividual IRI="#backtracking"/>
-        <NamedIndividual IRI="http://yago-knowledge.org/resource/Algorhythm"/>
-    </ObjectPropertyAssertion>
-    <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#is_an"/>
-        <NamedIndividual IRI="#hillclimbing"/>
-        <NamedIndividual IRI="http://yago-knowledge.org/resource/Algorhythm"/>
-    </ObjectPropertyAssertion>
-    <ObjectPropertyAssertion>
         <ObjectProperty IRI="#has_a"/>
         <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/validation_process"/>
@@ -70655,9 +70624,9 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/heuristic_search_algorithms"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#has"/>
+        <ObjectProperty IRI="#is_a"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/markov_decision_process"/>
-        <NamedIndividual IRI="#bellman_equations"/>
+        <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/markov_process"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#has_a"/>
@@ -70669,36 +70638,6 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto-optimal_sets"/>
     </ObjectPropertyAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>#backtracking</IRI>
-        <IRI>https://academic.microsoft.com/topic/156884757</IRI>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#backtracking</IRI>
-        <Literal xml:lang="en">backtracking</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>#bellman_equations</IRI>
-        <IRI>https://academic.microsoft.com/topic/14646407</IRI>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#bellman_equations</IRI>
-        <Literal xml:lang="en">bellman equations</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>#hillclimbing</IRI>
-        <IRI>https://academic.microsoft.com/topic/135450995</IRI>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#hillclimbing</IRI>
-        <Literal xml:lang="en">hillclimbing</Literal>
-    </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://schema.org/relatedLink"/>
         <IRI>#minimax_algorithm</IRI>
