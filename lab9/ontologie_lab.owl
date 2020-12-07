@@ -15785,9 +15785,6 @@
         <NamedIndividual IRI="http://sw.cyc.com/concept/Mx4rwauQZNc8Qdibm_jCfd9X4g"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="#minimax_algorithm"/>
-    </Declaration>
-    <Declaration>
         <NamedIndividual IRI="http://www.wikidata.org/entity/Q1000371"/>
     </Declaration>
     <Declaration>
@@ -70638,16 +70635,6 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto-optimal_sets"/>
     </ObjectPropertyAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>#minimax_algorithm</IRI>
-        <IRI>https://academic.microsoft.com/topic/149728462</IRI>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#minimax_algorithm</IRI>
-        <Literal xml:lang="en">minimax algorithm</Literal>
-    </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://schema.org/relatedLink"/>
         <IRI>https://cso.kmi.open.ac.uk/topics/multilayer_perceptron</IRI>
