@@ -15785,9 +15785,6 @@
         <NamedIndividual IRI="http://sw.cyc.com/concept/Mx4rwauQZNc8Qdibm_jCfd9X4g"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="#alpha_beta_pruning"/>
-    </Declaration>
-    <Declaration>
         <NamedIndividual IRI="#backtracking"/>
     </Declaration>
     <Declaration>
@@ -70648,11 +70645,6 @@
         <NamedIndividual IRI="http://yago-knowledge.org/resource/Algorhythm"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#can_have"/>
-        <NamedIndividual IRI="#minimax_algorithm"/>
-        <NamedIndividual IRI="#alpha_beta_pruning"/>
-    </ObjectPropertyAssertion>
-    <ObjectPropertyAssertion>
         <ObjectProperty IRI="#has_a"/>
         <NamedIndividual IRI="http://yago-knowledge.org/resource/State_transition_system"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/validation_process"/>
@@ -70677,16 +70669,6 @@
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto_optimality"/>
         <NamedIndividual IRI="https://cso.kmi.open.ac.uk/topics/pareto-optimal_sets"/>
     </ObjectPropertyAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty IRI="http://schema.org/relatedLink"/>
-        <IRI>#alpha_beta_pruning</IRI>
-        <IRI>https://academic.microsoft.com/topic/19001118</IRI>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#alpha_beta_pruning</IRI>
-        <Literal xml:lang="en">alpha beta pruning</Literal>
-    </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://schema.org/relatedLink"/>
         <IRI>#backtracking</IRI>
