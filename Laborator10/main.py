@@ -38,6 +38,8 @@ def sim_score(file1, file2):
 			suma += abs(content2[word] - content1[word])
 		else:
 			suma += content2[word]
+	print(len(content2))
+	print(len(content1))
 	print("Scor de similitudine: " + str(suma))
 	print("Media diferenței: " + str(suma / len(content2)))
 
