@@ -14,7 +14,7 @@ class VectorialRepresentation:
 	def __init__(self):
 		self.text_path = "text"
 		self.content = ""
-		self.alpha = 0.01
+		self.alpha = 0.1
 		self.training_input = []
 		self.window_size = 2
 		self.X_train = []
@@ -22,7 +22,7 @@ class VectorialRepresentation:
 		self.N = 10
 		self.words = []
 		self.word_index = {}
-		self.epochs = 100
+		self.epochs = 20
 		self.read_text()
 		self.preprocessing()
 		self.prepare_data_for_training()
@@ -132,8 +132,6 @@ class VectorialRepresentation:
 		for word in self.words:
 			tokens.append(self.predict(word, 10)[1])
 			labels.append(word)
-		print(tokens)
-		print(labels)
 		tsne_model = TSNE(perplexity=40, n_components=2, init='pca', n_iter=2500, random_state=23)
 		new_values = tsne_model.fit_transform(tokens)
 		x = []
